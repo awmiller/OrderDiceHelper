@@ -7,6 +7,12 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 
 /**
@@ -18,31 +24,27 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class GamePlayerFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String STRING_ARRAY_ARG_PLAYER_NAMES = "player<>names!0_:'1927";
+
+    private ArrayList<String> fetchList;
+    private ArrayList<Player> players;
+    private Game game;
 
     private OnFragmentInteractionListener mListener;
+    private TextView mGameLogView;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param PlayerNames list of string names associated with player objects that need to be filled.
      * @return A new instance of fragment GamePlayerFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static GamePlayerFragment newInstance(String param1, String param2) {
+    public static GamePlayerFragment newInstance(ArrayList<String> PlayerNames) {
         GamePlayerFragment fragment = new GamePlayerFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putStringArrayList(STRING_ARRAY_ARG_PLAYER_NAMES, PlayerNames);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,8 +57,7 @@ public class GamePlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            fetchList = getArguments().getStringArrayList(STRING_ARRAY_ARG_PLAYER_NAMES);
         }
     }
 
@@ -64,14 +65,13 @@ public class GamePlayerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_game_player, container, false);
-    }
+        View V =  inflater.inflate(R.layout.fragment_game_player, container, false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        mGameLogView = (TextView)V.findViewById(R.id.GameFragLogView);
+
+        playGame();
+
+        return V;
     }
 
     @Override
@@ -83,6 +83,17 @@ public class GamePlayerFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+
+        players = mListener.onPlayersFetchRequest(fetchList);
+
+        TurnPool MainCup = new TurnPool();
+
+        for(Player p : players)
+        {
+            MainCup.addPoolObjects(p.poolContent);
+        }
+        game = new Game(MainCup);
+
     }
 
     @Override
@@ -103,7 +114,27 @@ public class GamePlayerFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public ArrayList<Player> onPlayersFetchRequest(ArrayList<String> names);
     }
 
+    public void playGame()
+    {
+        TurnObject po = game.takeOneTurn();
+
+        if(po == null)
+        {
+            if(mGameLogView!=null)
+            {
+                mGameLogView.setText("Pool is empty!\r\n");
+            }
+        }
+        else
+        {
+            while(po!=null)
+            {
+                mGameLogView.append(String.format("Player %s has taken dice %d/%d\r\n",po.getOwnerName(),game.getTurn(),game.getAvailableTurns()));
+                po = game.takeOneTurn();
+            }
+        }
+    }
 }

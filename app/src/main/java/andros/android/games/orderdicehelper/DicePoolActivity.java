@@ -1,5 +1,7 @@
 package andros.android.games.orderdicehelper;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,11 +11,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DicePoolActivity extends FragmentActivity implements View.OnClickListener,
-PlayerConfigureFragment.OnFragmentInteractionListener{
+PlayerConfigureFragment.OnFragmentInteractionListener,
+GamePlayerFragment.OnFragmentInteractionListener{
 
     protected TurnPool MainCup;
     ArrayList<TurnObject> dice;
@@ -22,6 +26,17 @@ PlayerConfigureFragment.OnFragmentInteractionListener{
     private TextView mOwnerTextView;
     private Button mStartButton;
     private TextView mGameLog;
+
+    GamePlayerFragment gpf;
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getFragmentManager();
+        if(fm.getBackStackEntryCount()>0)
+            fm.popBackStack();
+        else
+            super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +49,16 @@ PlayerConfigureFragment.OnFragmentInteractionListener{
 
         players = new HashMap<>();
         players.put(">#//Wheres!_*&Waldo.?    ", new Player(">#//Wheres!_*&Waldo.?    "));
+
+        FragmentManager fm = getFragmentManager();
+
+        FragmentTransaction execute = fm.beginTransaction();
+
+        execute.add(R.id.FragmentContainer, new PlayerConfigureFragment());
+
+        execute.addToBackStack(null);
+
+        execute.commit();
     }
 
     @Override
@@ -85,29 +110,17 @@ PlayerConfigureFragment.OnFragmentInteractionListener{
 
     private void runGame() {
 
-        for(Player p : players.values())
-        {
-            MainCup.addPoolObjects(p.poolContent);
-        }
-        Game go = new Game(MainCup);
+        FragmentManager fm = getFragmentManager();
 
-        TurnObject po = go.takeOneTurn();
+        FragmentTransaction execute = fm.beginTransaction();
 
-        if(po == null)
-        {
-            if(mGameLog!=null)
-            {
-                mGameLog.setText("Pool is empty!\r\n");
-            }
-        }
-        else
-        {
-            while(po!=null)
-            {
-                mGameLog.append(String.format("Owner %s has taken dice %d/%d\r\n",po.getOwnerName(),go.getTurn(),go.getAvailableTurns()));
-                po = go.takeOneTurn();
-            }
-        }
+        gpf = GamePlayerFragment.newInstance(new ArrayList<>(players.keySet()));
+
+        execute.replace(R.id.FragmentContainer, gpf);
+
+        execute.addToBackStack(null);
+
+        execute.commit();
 
     }
 
@@ -131,5 +144,11 @@ PlayerConfigureFragment.OnFragmentInteractionListener{
     public void passClick(View v)
     {
         runGame();
+    }
+
+    @Override
+    public ArrayList<Player> onPlayersFetchRequest(ArrayList<String> names) {
+        //optionally we could scan names to selectively play with a subset of Players
+        return new ArrayList<>(players.values());
     }
 }
