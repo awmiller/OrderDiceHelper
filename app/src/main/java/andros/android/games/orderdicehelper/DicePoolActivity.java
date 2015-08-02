@@ -1,5 +1,6 @@
 package andros.android.games.orderdicehelper;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,7 +12,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class DicePoolActivity extends AppCompatActivity implements View.OnClickListener {
+public class DicePoolActivity extends FragmentActivity implements View.OnClickListener,
+PlayerConfigureFragment.OnFragmentInteractionListener{
 
     protected TurnPool MainCup;
     ArrayList<TurnObject> dice;
@@ -30,23 +32,15 @@ public class DicePoolActivity extends AppCompatActivity implements View.OnClickL
 
         dice = new ArrayList<>();
 
-        mAddDiceButton = (Button) findViewById(R.id.addDieButton);
-        mAddDiceButton.setOnClickListener(this);
-
-        mStartButton = (Button) findViewById(R.id.startGameButtonText);
-        mStartButton.setOnClickListener(this);
-
-        mOwnerTextView = (TextView)findViewById(R.id.editDieOwnerText);
-        mGameLog = (TextView)findViewById(R.id.GameLogView);
-
         players = new HashMap<>();
-        players.put(">#//Wheres!_*&Waldo.?    ",new Player(">#//Wheres!_*&Waldo.?    "));
-
+        players.put(">#//Wheres!_*&Waldo.?    ", new Player(">#//Wheres!_*&Waldo.?    "));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        mGameLog = (TextView)findViewById(R.id.GameLogView);
 
     }
 
@@ -84,33 +78,10 @@ public class DicePoolActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch(v.getId())
-        {
-            case R.id.startGameButtonText:
-                runGame();
-                break;
-            case R.id.addDieButton:
-                getNewDice();
-                break;
-        }
+
     }
 
-    private void getNewDice() {
-        if(mOwnerTextView!=null)
-        {
-            String name = mOwnerTextView.getText().toString();
 
-            if(players.containsKey(name))
-            {
-                players.get(name).addToPool(new TurnObject(players.get(name)));
-            }
-            else
-            {
-                players.put(name, new Player(name));
-                players.get(name).addToPool(new TurnObject(players.get(name)));
-            }
-        }
-    }
 
     private void runGame() {
 
@@ -140,4 +111,25 @@ public class DicePoolActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    @Override
+    public void onPlayerSubmitted(Player player) {
+        players.put(player.name(),player);
+    }
+
+    @Override
+    public Player getPlayerOrNew(String match) {
+        if (players.containsKey(match)) {
+            return players.get(match);
+        } else {
+            Player p = new Player(match);
+            players.put(match,p);
+            return p;
+        }
+    }
+
+    @Override
+    public void passClick(View v)
+    {
+        runGame();
+    }
 }
