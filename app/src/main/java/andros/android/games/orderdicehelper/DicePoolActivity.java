@@ -1,8 +1,5 @@
 package andros.android.games.orderdicehelper;
 
-import android.content.ReceiverCallNotAllowedException;
-import android.renderscript.Allocation;
-import android.support.v4.util.Pools;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,16 +9,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Random;
 
 public class DicePoolActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected TurnPool MainCup;
-    ArrayList<PoolObject> dice;
+    ArrayList<TurnObject> dice;
     HashMap<String,Player> players;
     Button mAddDiceButton;
     private TextView mOwnerTextView;
@@ -109,26 +102,25 @@ public class DicePoolActivity extends AppCompatActivity implements View.OnClickL
 
             if(players.containsKey(name))
             {
-                players.get(name).addToPool(new PoolObject(players.get(name)));
+                players.get(name).addToPool(new TurnObject(players.get(name)));
             }
             else
             {
                 players.put(name, new Player(name));
-                players.get(name).addToPool(new PoolObject(players.get(name)));
+                players.get(name).addToPool(new TurnObject(players.get(name)));
             }
         }
     }
 
     private void runGame() {
 
-        //MainCup.addPoolObjects(dice);
         for(Player p : players.values())
         {
-            MainCup.addPoolObjects(p.poolContent.AvailableTurns);
+            MainCup.addPoolObjects(p.poolContent);
         }
         Game go = new Game(MainCup);
 
-        PoolObject po = go.takeOneTurn();
+        TurnObject po = go.takeOneTurn();
 
         if(po == null)
         {
@@ -141,105 +133,11 @@ public class DicePoolActivity extends AppCompatActivity implements View.OnClickL
         {
             while(po!=null)
             {
-                mGameLog.append(String.format("Owner %s has taken dice %d/%d\r\n",po.Owner.Name,MainCup.AvailableTurns.indexOf(po),MainCup.size()));
+                mGameLog.append(String.format("Owner %s has taken dice %d/%d\r\n",po.getOwnerName(),go.getTurn(),go.getAvailableTurns()));
                 po = go.takeOneTurn();
             }
         }
 
     }
 
-    public class TurnPool{
-        protected ArrayList<PoolObject> AvailableTurns;
-
-        private Random randoNumGen;
-
-        public TurnPool(){
-            AvailableTurns = new ArrayList<>();
-            randoNumGen = new Random(System.nanoTime());
-        }
-
-        public int addPoolObjects(Collection<PoolObject> poolObjects)
-        {
-            AvailableTurns.addAll(poolObjects);
-            return AvailableTurns.size();
-        }
-
-        public int addPoolObject(PoolObject poolObject)
-        {
-            AvailableTurns.add(poolObject);
-            return AvailableTurns.size();
-        }
-
-        public PoolObject removeRandom()
-        {
-            if (AvailableTurns.size()>0) {
-
-                int gen =randoNumGen.nextInt(AvailableTurns.size());
-
-                return AvailableTurns.remove(gen);
-            }
-            else
-            {
-                return null;
-            }
-
-        }
-
-        public int size()
-        {
-            return AvailableTurns.size();
-        }
-    }
-
-    public class PoolObject {
-        private ArrayList<String> Faces;
-
-        public Player Owner;
-
-        public PoolObject(Player own)
-        {
-            Faces = new ArrayList<String>();
-            Collections.addAll(Faces, "1","2","3","4","5","6");
-            Owner = own;
-        }
-    }
-
-    public class Game {
-
-        TurnPool mainTurnPool;
-
-        public Game(TurnPool turnPool)
-        {
-            mainTurnPool = turnPool;
-        }
-
-        public PoolObject takeOneTurn()
-        {
-            return mainTurnPool.removeRandom();
-        }
-
-    }
-
-    public class Player
-    {
-        protected TurnPool poolContent;
-        private String Name;
-
-        public Player(String name)
-        {
-            Name = name;
-            poolContent = new TurnPool();
-        }
-
-        public int addToPool(PoolObject po)
-        {
-            poolContent.addPoolObject(po);
-            return poolContent.size();
-        }
-
-        public PoolObject removeOneFromPool()
-        {
-            return poolContent.removeRandom();
-        }
-    }
 }
