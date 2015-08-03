@@ -2,6 +2,7 @@ package andros.android.games.orderdicehelper;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,17 +19,19 @@ import java.util.HashMap;
 
 public class DicePoolActivity extends FragmentActivity implements View.OnClickListener,
 PlayerConfigureFragment.OnFragmentInteractionListener,
-GamePlayerFragment.OnFragmentInteractionListener{
+GamePlayerFragment.OnFragmentInteractionListener,
+PlayerCardListFragment.OnFragmentInteractionListener{
 
     protected TurnPool MainCup;
     ArrayList<TurnObject> dice;
     HashMap<String,Player> players;
     GamePlayerFragment gpf;
+    private PlayerCardListFragment mPlayerListFragment;
 
     @Override
     public void onBackPressed() {
         FragmentManager fm = getFragmentManager();
-        if(fm.getBackStackEntryCount()>0)
+        if(fm.getBackStackEntryCount()>1)
             fm.popBackStack();
         else
             super.onBackPressed();
@@ -44,8 +47,16 @@ GamePlayerFragment.OnFragmentInteractionListener{
         dice = new ArrayList<>();
 
         players = new HashMap<>();
-        players.put(">#//Wheres!_*&Waldo.?    ", new Player(">#//Wheres!_*&Waldo.?    "));
 
+        FragmentTransaction execute = getFragmentManager().beginTransaction();
+
+        mPlayerListFragment =  new PlayerCardListFragment();
+
+        execute.add(R.id.FragmentContainer,mPlayerListFragment);
+
+        execute.addToBackStack(null);
+
+        execute.commit();
     }
 
 
@@ -98,7 +109,7 @@ GamePlayerFragment.OnFragmentInteractionListener{
 
         FragmentManager fm = getFragmentManager();
 
-        if (fm.getBackStackEntryCount()>0)
+        if (fm.getBackStackEntryCount()>1)
         {
             Toast.makeText(DicePoolActivity.this, "Please submit current Player or Exit current Game", Toast.LENGTH_SHORT).show();
         }
@@ -141,6 +152,8 @@ GamePlayerFragment.OnFragmentInteractionListener{
     @Override
     public void onPlayerSubmitted(Player player) {
         players.put(player.name(),player);
+
+        getFragmentManager().popBackStack();
     }
 
     @Override
@@ -164,5 +177,10 @@ GamePlayerFragment.OnFragmentInteractionListener{
     public ArrayList<Player> onPlayersFetchRequest(ArrayList<String> names) {
         //optionally we could scan names to selectively play with a subset of Players
         return new ArrayList<>(players.values());
+    }
+
+    @Override
+    public HashMap<String, Player> onFragmentRequestsPlayers() {
+        return players;
     }
 }

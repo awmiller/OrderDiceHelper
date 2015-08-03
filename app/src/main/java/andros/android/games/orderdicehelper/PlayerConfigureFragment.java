@@ -104,11 +104,19 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
+
+        mOwnerTextView.clearFocus();
+
         switch(v.getId())
         {
             case R.id.submitPlayerButton:
                 if(mListener!=null)
                 {
+                    if (player==null) {
+                        String name = mOwnerTextView.getText().toString();
+                        player = mListener.getPlayerOrNew(name);
+                    }
+
                     mListener.onPlayerSubmitted(player);
                 }
                 break;
