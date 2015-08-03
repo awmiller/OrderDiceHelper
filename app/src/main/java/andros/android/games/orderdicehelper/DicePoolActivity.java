@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -22,11 +23,6 @@ GamePlayerFragment.OnFragmentInteractionListener{
     protected TurnPool MainCup;
     ArrayList<TurnObject> dice;
     HashMap<String,Player> players;
-    Button mAddDiceButton;
-    private TextView mOwnerTextView;
-    private Button mStartButton;
-    private TextView mGameLog;
-
     GamePlayerFragment gpf;
 
     @Override
@@ -50,22 +46,13 @@ GamePlayerFragment.OnFragmentInteractionListener{
         players = new HashMap<>();
         players.put(">#//Wheres!_*&Waldo.?    ", new Player(">#//Wheres!_*&Waldo.?    "));
 
-        FragmentManager fm = getFragmentManager();
-
-        FragmentTransaction execute = fm.beginTransaction();
-
-        execute.add(R.id.FragmentContainer, new PlayerConfigureFragment());
-
-        execute.addToBackStack(null);
-
-        execute.commit();
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        mGameLog = (TextView)findViewById(R.id.GameLogView);
 
     }
 
@@ -93,12 +80,39 @@ GamePlayerFragment.OnFragmentInteractionListener{
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_add_player:
+                configNewPlayer();
+                break;
+            case R.id.start_game:
+                runGame();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void configNewPlayer() {
+
+        FragmentManager fm = getFragmentManager();
+
+        if (fm.getBackStackEntryCount()>0)
+        {
+            Toast.makeText(DicePoolActivity.this, "Please submit current Player or Exit current Game", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            FragmentTransaction execute = fm.beginTransaction();
+
+            execute.replace(R.id.FragmentContainer, new PlayerConfigureFragment());
+
+            execute.addToBackStack(null);
+
+            execute.commit();
+        }
+
     }
 
     @Override

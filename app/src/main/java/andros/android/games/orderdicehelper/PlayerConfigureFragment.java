@@ -1,7 +1,6 @@
 package andros.android.games.orderdicehelper;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -20,10 +19,13 @@ import android.widget.TextView;
  */
 public class PlayerConfigureFragment extends Fragment implements View.OnClickListener {
 
+    private static final String STRING_NAME_ARGUEMENT = "Player!!(NAme_+=12345";
     private OnFragmentInteractionListener mListener;
     private TextView mOwnerTextView;
     private Button mAddDiceButton;
-    private Button mStartButton;
+    private Button SubmitPlayerButton;
+    Player player;
+    private TextView mDiceCountView;
 
     /**
      * Use this factory method to create a new instance of
@@ -31,9 +33,22 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
      *
      * @return A new instance of fragment PlayerConfigureFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static PlayerConfigureFragment newInstance() {
         PlayerConfigureFragment fragment = new PlayerConfigureFragment();
+        return fragment;
+    }
+
+    /**
+     * Overloaded newInstance() supports referencing an existing playername indirectly
+     *
+     * @param playerName string value used to bind this fragment to the existing player object
+     * @return A new fragment
+     */
+    public static PlayerConfigureFragment newInstance(String playerName) {
+        PlayerConfigureFragment fragment = new PlayerConfigureFragment();
+        Bundle bund = new Bundle();
+        bund.putString(STRING_NAME_ARGUEMENT,playerName);
+        fragment.setArguments(bund);
         return fragment;
     }
 
@@ -44,23 +59,24 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_configure_player,container,false);
 
+        View view = inflater.inflate(R.layout.fragment_configure_player,container,false);
 
         mOwnerTextView = (TextView)view.findViewById(R.id.editDieOwnerText);
 
         mAddDiceButton = (Button) view.findViewById(R.id.addDieButton);
         mAddDiceButton.setOnClickListener(this);
 
-        mStartButton = (Button) view.findViewById(R.id.startGameButtonText);
-        mStartButton.setOnClickListener(this);
+        SubmitPlayerButton = (Button) view.findViewById(R.id.submitPlayerButton);
+        SubmitPlayerButton.setOnClickListener(this);
+
+        mDiceCountView = (TextView) view.findViewById(R.id.diceCountTextView);
 
         return view;
     }
@@ -74,6 +90,10 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        if (getArguments() != null) {
+            String name = getArguments().getString(STRING_NAME_ARGUEMENT);
+            player = mListener.getPlayerOrNew(name);
+        }
     }
 
     @Override
@@ -86,10 +106,10 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
     public void onClick(View v) {
         switch(v.getId())
         {
-            case R.id.startGameButtonText:
+            case R.id.submitPlayerButton:
                 if(mListener!=null)
                 {
-                    mListener.passClick(v);
+                    mListener.onPlayerSubmitted(player);
                 }
                 break;
             case R.id.addDieButton:
@@ -101,13 +121,12 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
     private void addDiceCallback() {
         if ((mOwnerTextView != null)&&(mListener!=null)) {
 
-            String name = mOwnerTextView.getText().toString();
+            if (player==null) {
+                String name = mOwnerTextView.getText().toString();
+                player = mListener.getPlayerOrNew(name);
+            }
 
-            Player p = mListener.getPlayerOrNew(name);
-
-            p.addToPool(new TurnObject(p));
-
-            mListener.onPlayerSubmitted(p);
+            player.addToPool(new TurnObject(player));
         }
     }
 
