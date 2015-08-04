@@ -6,14 +6,12 @@ import android.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-
-import andros.android.games.orderdicehelper.dummy.DummyContent;
+import andros.android.games.orderdicehelper.objects.Player;
 
 /**
  * A fragment representing a list of Items.

@@ -1,4 +1,4 @@
-package andros.android.games.orderdicehelper;
+package andros.android.games.orderdicehelper.objects;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import andros.android.games.orderdicehelper.objects.Player;
+import andros.android.games.orderdicehelper.objects.TurnObject;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the

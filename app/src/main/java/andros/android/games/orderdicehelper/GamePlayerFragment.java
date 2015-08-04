@@ -1,7 +1,6 @@
 package andros.android.games.orderdicehelper;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,10 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import andros.android.games.orderdicehelper.objects.Game;
+import andros.android.games.orderdicehelper.objects.Player;
+import andros.android.games.orderdicehelper.objects.TurnObject;
+import andros.android.games.orderdicehelper.objects.TurnPool;
 
 
 /**

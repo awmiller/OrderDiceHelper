@@ -1,10 +1,10 @@
-package andros.android.games.orderdicehelper;
+package andros.android.games.orderdicehelper.objects;
 
 /**
  * Created by Andrew on 8/2/2015.
  */
 public class Player {
-    protected TurnPool poolContent;
+    public TurnPool poolContent;
     private String Name;
 
     public Player(String name) {

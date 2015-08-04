@@ -2,20 +2,19 @@ package andros.android.games.orderdicehelper;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import andros.android.games.orderdicehelper.objects.Player;
+import andros.android.games.orderdicehelper.objects.TurnObject;
+import andros.android.games.orderdicehelper.objects.TurnPool;
 
 public class DicePoolActivity extends FragmentActivity implements View.OnClickListener,
 PlayerConfigureFragment.OnFragmentInteractionListener,
@@ -151,7 +150,7 @@ PlayerCardListFragment.OnFragmentInteractionListener{
 
     @Override
     public void onPlayerSubmitted(Player player) {
-        players.put(player.name(),player);
+        players.put(player.name(), player);
 
         getFragmentManager().popBackStack();
     }
