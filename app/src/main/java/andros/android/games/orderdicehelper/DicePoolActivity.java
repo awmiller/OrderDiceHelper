@@ -182,4 +182,9 @@ PlayerCardListFragment.OnFragmentInteractionListener{
     public HashMap<String, Player> onFragmentRequestsPlayers() {
         return players;
     }
+
+    @Override
+    public boolean onListItemClicked(Player player) {
+        return false;
+    }
 }

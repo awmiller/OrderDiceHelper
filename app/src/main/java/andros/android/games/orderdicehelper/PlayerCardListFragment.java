@@ -24,7 +24,6 @@ public class PlayerCardListFragment extends ListFragment {
 
     private OnFragmentInteractionListener mListener;
     private HashMap<String,Player> players;
-    private ArrayList<Player> ITEMS;
     private PlayerListAdapter mListAdapter;
     // TODO: Rename and change types of parameters
     public static PlayerCardListFragment newInstance(String param1, String param2) {
@@ -45,11 +44,8 @@ public class PlayerCardListFragment extends ListFragment {
 
         if (getArguments() != null) {
         }
-
-
-        ITEMS = new ArrayList<>();
-
         players = new HashMap<>();
+        mListAdapter = new PlayerListAdapter(new ArrayList<>(players.values()),getActivity());
     }
 
     /**
@@ -73,11 +69,15 @@ public class PlayerCardListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        players = mListener.onFragmentRequestsPlayers();
-
-        updatePlayers();
-
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        players = mListener.onFragmentRequestsPlayers();
+        mListAdapter.addAll(players.values());
+        setListAdapter(mListAdapter);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PlayerCardListFragment extends ListFragment {
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            //mListener.onFragmentRequestsPlayers(DummyContent.ITEMS.get(position).id);
+            mListener.onListItemClicked(mListAdapter.getItem(position));
         }
     }
 
@@ -120,28 +120,7 @@ public class PlayerCardListFragment extends ListFragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public HashMap<String,Player> onFragmentRequestsPlayers();
-    }
-
-    public void updatePlayers()
-    {
-        for(Player p: players.values())
-        {
-            if(!ITEMS.contains(p))
-                ITEMS.add(p);
-        }
-
-        setListAdapter(new PlayerListAdapter(ITEMS,getActivity()));
-    }
-    public void updatePlayers(Collection<Player> cPlayers)
-    {
-        for(Player p: cPlayers)
-        {
-            players.put(p.name(),p);
-        }
-
-        ITEMS = new ArrayList<>(players.values());
-
-        setListAdapter(new PlayerListAdapter(ITEMS,getActivity()));
+        HashMap<String,Player> onFragmentRequestsPlayers();
+        boolean onListItemClicked(Player player);
     }
 }
