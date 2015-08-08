@@ -20,4 +20,11 @@ public class Player {
     public TurnObject removeOneFromPool() {
         return poolContent.removeRandom();
     }
+
+    public void addToPool(TurnObject turnObject, int dice) {
+        for(int i = 0; i < dice; i++)
+        {
+            addToPool(new TurnObject(turnObject));
+        }
+    }
 }

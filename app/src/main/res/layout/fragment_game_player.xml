@@ -6,7 +6,6 @@
     android:background="@drawable/fragment_style">
 
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:id="@+id/GameFragLogView"
-        android:text="Default text" />
+        android:id="@+id/GameFragLogView" />
 
 </FrameLayout>

@@ -2,6 +2,7 @@ package andros.android.games.orderdicehelper;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -154,7 +155,11 @@ PlayerCardListFragment.OnFragmentInteractionListener{
 
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
 
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     private void runGame() {
 
@@ -169,6 +174,20 @@ PlayerCardListFragment.OnFragmentInteractionListener{
         execute.addToBackStack(null);
 
         execute.commit();
+
+//        Intent intent = new Intent();
+//        String[] playernames = players.keySet().toArray(new String[players.size()]);
+//        Integer[] playerdice = new Integer[playernames.length];
+//        for(int i =0; i<playernames.length;i++)
+//        {
+//            playerdice[i] = players.get(playernames[i]).poolContent.size();
+//        }
+//        intent.putExtra(GameActivity.ORDERED_PLAYER_LIST_EXTRA,playernames );
+//
+//        intent.putExtra(GameActivity.ORDERED_PLAYER_DICE_EXTRA,playerdice);
+//
+//        intent.putExtra(GameActivity.TURN_OBJECT_TYPE_EXTRA,TurnObject.class.getCanonicalName());
+
 
     }
 
