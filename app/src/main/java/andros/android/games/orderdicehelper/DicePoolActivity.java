@@ -138,11 +138,13 @@ PlayerCardListFragment.OnFragmentInteractionListener{
 
             PlayerConfigureFragment pcf = PlayerConfigureFragment.newInstance(player.Name);
 
-            execute.replace(R.id.FragmentContainer,pcf);
+            execute.replace(R.id.FragmentContainer, pcf);
 
             execute.addToBackStack(null);
 
             execute.commit();
+
+            pcf.setPlayer(player);
         }
 
     }
@@ -175,6 +177,14 @@ PlayerCardListFragment.OnFragmentInteractionListener{
         players.put(player.Name, player);
 
         getFragmentManager().popBackStack();
+    }
+
+    @Override
+    public Player onPlayerRequested(String name) {
+        if(players.containsKey(name))
+            return players.get(name);
+        else
+            return new Player(name);
     }
 
     @Override

@@ -22,7 +22,8 @@
         android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:hint="Die Owner" />
+        android:hint="Die Owner"
+        android:imeOptions="actionDone" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

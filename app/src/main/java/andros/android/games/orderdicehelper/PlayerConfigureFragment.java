@@ -1,11 +1,13 @@
 package andros.android.games.orderdicehelper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -79,14 +81,16 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
         SubmitPlayerButton.setOnClickListener(this);
         mDiceCountView = (TextView) view.findViewById(R.id.diceCountTextView);
 
-        player = new Player("Waldo");
-
         if (getArguments() != null) {
             String name = getArguments().getString(STRING_NAME_ARGUEMENT);
             mOwnerTextView.setText(name);
             mOwnerTextView.setClickable(false);
             mOwnerTextView.setFocusable(false);
-            player.Name = name;
+            player = mListener.onPlayerRequested(name);
+        }
+        else
+        {
+            player = new Player("Waldo");
         }
 
         return view;
@@ -101,6 +105,11 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    public void setPlayer(Player pass)
+    {
+        player = pass;
     }
 
     @Override
@@ -150,6 +159,8 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onPlayerSubmitted(Player player);
+
+        Player onPlayerRequested(String name);
         //in the future add the option to compile subclasses of TurnObject
         //public TurnObject constructTurnObject();
     }
