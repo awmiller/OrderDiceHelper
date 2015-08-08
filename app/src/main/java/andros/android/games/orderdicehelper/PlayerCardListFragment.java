@@ -76,6 +76,7 @@ public class PlayerCardListFragment extends ListFragment {
     public void onResume() {
         super.onResume();
         players = mListener.onFragmentRequestsPlayers();
+        mListAdapter.clear();
         mListAdapter.addAll(players.values());
         setListAdapter(mListAdapter);
     }

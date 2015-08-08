@@ -12,6 +12,6 @@ public class TurnObject {
     }
 
     public String getOwnerName() {
-        return Owner.name();
+        return Owner.Name;
     }
 }

@@ -39,7 +39,7 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
             convertView = ((Activity)(mContext)).getLayoutInflater().inflate(R.layout.player_list_item,null);
         }
 
-        ((TextView)convertView.findViewById(R.id.textViewPlayerName)).setText(p.name());
+        ((TextView)convertView.findViewById(R.id.textViewPlayerName)).setText(p.Name);
         ((TextView)convertView.findViewById(R.id.textViewDiceCount)).setText(String.valueOf(p.poolContent.size()));
 
         return convertView;

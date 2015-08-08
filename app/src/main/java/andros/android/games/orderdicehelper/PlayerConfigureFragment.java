@@ -20,7 +20,7 @@ import andros.android.games.orderdicehelper.objects.TurnObject;
  * Use the {@link PlayerConfigureFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PlayerConfigureFragment extends Fragment implements View.OnClickListener {
+public class PlayerConfigureFragment extends Fragment implements View.OnClickListener, View.OnFocusChangeListener {
 
     private static final String STRING_NAME_ARGUEMENT = "Player!!(NAme_+=12345";
     private OnFragmentInteractionListener mListener;
@@ -72,14 +72,22 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
         View view = inflater.inflate(R.layout.fragment_configure_player,container,false);
 
         mOwnerTextView = (TextView)view.findViewById(R.id.editDieOwnerText);
-
+        mOwnerTextView.setOnFocusChangeListener(this);
         mAddDiceButton = (Button) view.findViewById(R.id.addDieButton);
         mAddDiceButton.setOnClickListener(this);
-
         SubmitPlayerButton = (Button) view.findViewById(R.id.submitPlayerButton);
         SubmitPlayerButton.setOnClickListener(this);
-
         mDiceCountView = (TextView) view.findViewById(R.id.diceCountTextView);
+
+        player = new Player("Waldo");
+
+        if (getArguments() != null) {
+            String name = getArguments().getString(STRING_NAME_ARGUEMENT);
+            mOwnerTextView.setText(name);
+            mOwnerTextView.setClickable(false);
+            mOwnerTextView.setFocusable(false);
+            player.Name = name;
+        }
 
         return view;
     }
@@ -92,10 +100,6 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
-        }
-        if (getArguments() != null) {
-            String name = getArguments().getString(STRING_NAME_ARGUEMENT);
-            player = mListener.getPlayerOrNew(name);
         }
     }
 
@@ -113,15 +117,7 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
         switch(v.getId())
         {
             case R.id.submitPlayerButton:
-                if(mListener!=null)
-                {
-                    if (player==null) {
-                        String name = mOwnerTextView.getText().toString();
-                        player = mListener.getPlayerOrNew(name);
-                    }
-
-                    mListener.onPlayerSubmitted(player);
-                }
+                mListener.onPlayerSubmitted(player);
                 break;
             case R.id.addDieButton:
                 addDiceCallback();
@@ -130,14 +126,14 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
     }
 
     private void addDiceCallback() {
-        if ((mOwnerTextView != null)&&(mListener!=null)) {
+        player.addToPool(new TurnObject(player));
+    }
 
-            if (player==null) {
-                String name = mOwnerTextView.getText().toString();
-                player = mListener.getPlayerOrNew(name);
-            }
-
-            player.addToPool(new TurnObject(player));
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if(!hasFocus)
+        {
+            player.Name = mOwnerTextView.getText().toString();
         }
     }
 
@@ -153,9 +149,9 @@ public class PlayerConfigureFragment extends Fragment implements View.OnClickLis
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onPlayerSubmitted(Player player);
-        public Player getPlayerOrNew(String match);
-        public void passClick(View v);
+        void onPlayerSubmitted(Player player);
+        //in the future add the option to compile subclasses of TurnObject
+        //public TurnObject constructTurnObject();
     }
 
 }

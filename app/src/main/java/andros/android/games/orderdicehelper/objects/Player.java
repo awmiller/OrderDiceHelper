@@ -5,7 +5,7 @@ package andros.android.games.orderdicehelper.objects;
  */
 public class Player {
     public TurnPool poolContent;
-    private String Name;
+    public String Name;
 
     public Player(String name) {
         Name = name;
@@ -15,10 +15,6 @@ public class Player {
     public int addToPool(TurnObject po) {
         poolContent.addPoolObject(po);
         return poolContent.size();
-    }
-
-    public String name() {
-        return Name;
     }
 
     public TurnObject removeOneFromPool() {

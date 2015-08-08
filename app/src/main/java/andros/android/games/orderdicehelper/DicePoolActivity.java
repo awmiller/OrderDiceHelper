@@ -124,6 +124,28 @@ PlayerCardListFragment.OnFragmentInteractionListener{
         }
 
     }
+    private void configPlayer(Player player) {
+
+        FragmentManager fm = getFragmentManager();
+
+        if (fm.getBackStackEntryCount()>1)
+        {
+            Toast.makeText(DicePoolActivity.this, "Please submit current Player or Exit current Game", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            FragmentTransaction execute = fm.beginTransaction();
+
+            PlayerConfigureFragment pcf = PlayerConfigureFragment.newInstance(player.Name);
+
+            execute.replace(R.id.FragmentContainer,pcf);
+
+            execute.addToBackStack(null);
+
+            execute.commit();
+        }
+
+    }
 
     @Override
     public void onClick(View v) {
@@ -150,26 +172,9 @@ PlayerCardListFragment.OnFragmentInteractionListener{
 
     @Override
     public void onPlayerSubmitted(Player player) {
-        players.put(player.name(), player);
+        players.put(player.Name, player);
 
         getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public Player getPlayerOrNew(String match) {
-        if (players.containsKey(match)) {
-            return players.get(match);
-        } else {
-            Player p = new Player(match);
-            players.put(match,p);
-            return p;
-        }
-    }
-
-    @Override
-    public void passClick(View v)
-    {
-        runGame();
     }
 
     @Override
@@ -185,6 +190,12 @@ PlayerCardListFragment.OnFragmentInteractionListener{
 
     @Override
     public boolean onListItemClicked(Player player) {
+
+        if(player != null)
+        {
+            configPlayer(player);
+            return true;
+        }
         return false;
     }
 }
