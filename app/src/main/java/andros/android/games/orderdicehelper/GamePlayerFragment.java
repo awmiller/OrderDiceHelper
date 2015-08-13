@@ -1,6 +1,8 @@
 package andros.android.games.orderdicehelper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 import andros.android.games.orderdicehelper.objects.Game;
+import andros.android.games.orderdicehelper.objects.GameTypeSettings;
 import andros.android.games.orderdicehelper.objects.Player;
 import andros.android.games.orderdicehelper.objects.TurnObject;
 import andros.android.games.orderdicehelper.objects.TurnPool;
@@ -23,7 +26,6 @@ import andros.android.games.orderdicehelper.objects.TurnPool;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link GamePlayerFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link GamePlayerFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -35,11 +37,25 @@ public class GamePlayerFragment extends Fragment {
     private ArrayList<String> fetchList;
     private ArrayList<Player> players;
     private Game game;
+    private TurnObject currentTurn;
 
-    private OnFragmentInteractionListener mListener;
     private TextView mGameLogView;
 
     private ArrayDeque<TurnObject> turnDeque;
+
+    GameTypeSettings mGameSettings;
+    private DialogInterface.OnClickListener onActionSelected
+            = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            mGameLogView.append(
+                    String.format("Player %s has taken dice %d/%d\r\nPlayer selects action: %s",
+                            currentTurn.getOwnerName(),
+                            game.getTurn(),
+                            game.getAvailableTurns(),
+                            currentTurn.describeActions()[which]));
+        }
+    };
 
     /**
      * Use this factory method to create a new instance of
@@ -68,6 +84,14 @@ public class GamePlayerFragment extends Fragment {
         }
         setHasOptionsMenu(true);
         turnDeque = new ArrayDeque<>();
+
+        TurnPool MainCup = new TurnPool();
+
+        for(Player p : players)
+        {
+            MainCup.addPoolObjects(p.poolContent);
+        }
+        game = new Game(MainCup);
     }
 
     @Override
@@ -119,44 +143,21 @@ public class GamePlayerFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-
-        players = mListener.onPlayersFetchRequest(fetchList);
-
-        TurnPool MainCup = new TurnPool();
-
-        for(Player p : players)
-        {
-            MainCup.addPoolObjects(p.poolContent);
-        }
-        game = new Game(MainCup);
 
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public ArrayList<Player> onPlayersFetchRequest(ArrayList<String> names);
+    public void setGameSettings(GameTypeSettings Settings) {
+        mGameSettings = Settings;
+    }
+
+    public void setPlayers(ArrayList<Player> plist)
+    {
+        players = plist;
     }
 
     public void playGame()
@@ -190,8 +191,17 @@ public class GamePlayerFragment extends Fragment {
             }
         } else {
 
-            mGameLogView.append(String.format("Player %s has taken dice %d/%d\r\n", po.getOwnerName(), game.getTurn(), game.getAvailableTurns()));
+            currentTurn = po;
+            showUnitDialog();
 
         }
+    }
+
+    private void showUnitDialog() {
+
+        AlertDialog.Builder actionDialog = new AlertDialog.Builder(getActivity());
+        actionDialog.setItems(currentTurn.describeActions(),onActionSelected);
+        actionDialog.create().show();
+
     }
 }

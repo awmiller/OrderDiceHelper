@@ -13,13 +13,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import andros.android.games.orderdicehelper.objects.GameTypeSettings;
 import andros.android.games.orderdicehelper.objects.Player;
 import andros.android.games.orderdicehelper.objects.TurnObject;
 import andros.android.games.orderdicehelper.objects.TurnPool;
 
 public class DicePoolActivity extends FragmentActivity implements View.OnClickListener,
 PlayerConfigureFragment.OnFragmentInteractionListener,
-GamePlayerFragment.OnFragmentInteractionListener,
 PlayerCardListFragment.OnFragmentInteractionListener{
 
     protected TurnPool MainCup;
@@ -27,6 +27,8 @@ PlayerCardListFragment.OnFragmentInteractionListener{
     HashMap<String,Player> players;
     GamePlayerFragment gpf;
     private PlayerCardListFragment mPlayerListFragment;
+
+    public GameTypeSettings mSettings = new GameTypeSettings();
 
     @Override
     public void onBackPressed() {
@@ -57,6 +59,9 @@ PlayerCardListFragment.OnFragmentInteractionListener{
         execute.addToBackStack(null);
 
         execute.commit();
+
+        mSettings = new GameTypeSettings();
+        mSettings.setGameType(GameTypeSettings.GAME_TYPE_BOLT_ACTION);
     }
 
 
@@ -169,25 +174,16 @@ PlayerCardListFragment.OnFragmentInteractionListener{
 
         gpf = GamePlayerFragment.newInstance(new ArrayList<>(players.keySet()));
 
+
         execute.replace(R.id.FragmentContainer, gpf);
 
         execute.addToBackStack(null);
 
         execute.commit();
 
-//        Intent intent = new Intent();
-//        String[] playernames = players.keySet().toArray(new String[players.size()]);
-//        Integer[] playerdice = new Integer[playernames.length];
-//        for(int i =0; i<playernames.length;i++)
-//        {
-//            playerdice[i] = players.get(playernames[i]).poolContent.size();
-//        }
-//        intent.putExtra(GameActivity.ORDERED_PLAYER_LIST_EXTRA,playernames );
-//
-//        intent.putExtra(GameActivity.ORDERED_PLAYER_DICE_EXTRA,playerdice);
-//
-//        intent.putExtra(GameActivity.TURN_OBJECT_TYPE_EXTRA,TurnObject.class.getCanonicalName());
+        gpf.setGameSettings(mSettings);
 
+        gpf.setPlayers(new ArrayList<>(players.values()));
 
     }
 
@@ -207,12 +203,6 @@ PlayerCardListFragment.OnFragmentInteractionListener{
     }
 
     @Override
-    public ArrayList<Player> onPlayersFetchRequest(ArrayList<String> names) {
-        //optionally we could scan names to selectively play with a subset of Players
-        return new ArrayList<>(players.values());
-    }
-
-    @Override
     public HashMap<String, Player> onFragmentRequestsPlayers() {
         return players;
     }
@@ -227,4 +217,5 @@ PlayerCardListFragment.OnFragmentInteractionListener{
         }
         return false;
     }
+
 }
